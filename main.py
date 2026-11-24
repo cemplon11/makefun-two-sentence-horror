@@ -35,9 +35,12 @@ def validate(text: str) -> None:
     """Check the story against the competition gate before writing it.
 
     The gate needs UTF-8 text of 1 to 400 characters, not only
-    whitespace, told in exactly two sentences. A period marks the end
+    whitespace, told in exactly two sentences, with no newline
+    characters and no empty sentence. A period marks the end
     of each sentence here, so two periods means two sentences.
     """
+    if "\n" in text or "\r" in text:
+        raise ValueError("story must not contain newline characters")
     if not text.strip():
         raise ValueError("story must not be empty or only whitespace")
     if len(text) > MAX_CHARS:
@@ -48,6 +51,12 @@ def validate(text: str) -> None:
         raise ValueError(
             f"story must be exactly two sentences, found "
             f"{text.count('.')} sentence-ending periods"
+        )
+    sentences = [s.strip() for s in text.split(".") if s.strip()]
+    if len(sentences) != 2:
+        raise ValueError(
+            f"story must contain two non-empty sentences, found "
+            f"{len(sentences)}"
         )
     text.encode("utf-8")
 
